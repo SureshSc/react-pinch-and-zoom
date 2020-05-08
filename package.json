@@ -1,7 +1,7 @@
 {
-  "name": "react-pinch-and-zoom",
-  "version": "1.2.5",
-  "author": "Conrad Lo",
+  "name": "react-pinch-zoom-cust",
+  "version": "1.2.6",
+  "author": "Suresh S C",
   "description": "A react container component with pinch-to-zoom gesture interaction.",
   "keywords": [
     "react",
