@@ -93,6 +93,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
   public pinchStartTouchMidpoint: Point.Point
   public pinchStartTranslate: Point.Point
   public pinchStartTouchPointDist: number
+  public previousTouchDist: number
 
   public panStartPoint: Point.Point
   public panStartTranslate: Point.Point
@@ -117,6 +118,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     this.pinchStartTouchMidpoint = Point.newOriginPoint()
     this.pinchStartTranslate = Point.newOriginPoint()
     this.pinchStartTouchPointDist = 0
+    this.previousTouchDist = 0
 
     // instance variable: pan
     this.panStartPoint = Point.newOriginPoint()
@@ -167,7 +169,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
 
     // on pinch start remember the distance of 2 touch points
     this.pinchStartTouchPointDist = Point.distance(p1, p2)
-
+    this.previousTouchDist = Point.distance(p1, p2)
     /*
       on pinch start, remember the `origianl zoom factor`
       & `origianl plan translate` before pinching
@@ -184,6 +186,23 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     // const pinchCurrentTouchMidpoint = SeatingPlan.calculateMidpoint({ x1, y1 }, { x2, y2 });
 
     const pinchCurrentTouchPointDist = Point.distance(p1, p2)
+
+    // console.log("previousTouchDist",Math.floor(this.previousTouchDist))
+    // console.log("pinchCurrentTouchPointDist",Math.floor( pinchCurrentTouchPointDist))
+
+    if (Math.floor(this.previousTouchDist) === Math.floor( pinchCurrentTouchPointDist)) {
+      console.log("Two fingure scroll")
+      if (this.currentGesture === GUESTURE_TYPE.PINCH) {
+        this.handleTouchStartForPanFromPinch(syntheticEvent)
+      }
+      this.currentGesture =  GUESTURE_TYPE.PAN
+
+      this.onPanMove(syntheticEvent)
+      return
+    }
+    this.currentGesture =  GUESTURE_TYPE.PINCH
+
+    this.previousTouchDist = pinchCurrentTouchPointDist
 
     // delta > 0: enlarge(zoon in), delta < 0: diminish(zoom out)
     const deltaTouchPointDist =
@@ -219,6 +238,9 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     const dragOffset = Point.offset(dragPoint, origin)
     const adjustedZoomOffset = Point.scale(dragOffset, 1 / currentZoomFactor)
     const nextTranslate = Point.sum(adjustedZoomOffset, prevTranslate)
+
+    console.log("nextTranslate", nextTranslate)
+
     this.panContentArea(nextTranslate)
   }
 
@@ -359,6 +381,25 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     event handlers
   */
 
+  public handleTouchStartForPanFromPinch(syntheticEvent: React.SyntheticEvent) {
+    if (!this.zoomAreaContainer || !this.zoomArea) {
+      return
+    }
+    const { nativeEvent } = syntheticEvent
+    if (!(nativeEvent instanceof TouchEvent)) {
+      return
+    }
+    
+    this.zoomArea.style.transitionDuration = '0.0s'
+
+    console.log("handleTouchStartForPanFromPinch")
+
+    const [p1] = PinchToZoom.getTouchesCoordinate(syntheticEvent)
+    this.setState({ lastSingleTouchPoint: p1 })
+    this.currentGesture = GUESTURE_TYPE.PAN
+    this.onPanStart(syntheticEvent)
+
+  }
   public handleTouchStart(syntheticEvent: React.SyntheticEvent) {
     if (!this.zoomAreaContainer || !this.zoomArea) {
       return
@@ -368,6 +409,18 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
       return
     }
     this.zoomArea.style.transitionDuration = '0.0s'
+    
+    console.log("handleTouchStart")
+
+    // console.log("handleTouchStart - start")
+    // const [p1] = PinchToZoom.getTouchesCoordinate(syntheticEvent)
+    // this.setState({ lastSingleTouchPoint: p1 })
+    // this.currentGesture = GUESTURE_TYPE.PAN
+    // this.onPanStart(syntheticEvent)
+    // this.currentGesture = GUESTURE_TYPE.PINCH
+    // this.onPinchStart(syntheticEvent)
+    // console.log("handleTouchStart - end")
+  
     // 2 touches == pinch, else all considered as pan
     switch (nativeEvent.touches.length) {
       case 2:
@@ -390,11 +443,13 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     if (!(nativeEvent instanceof TouchEvent)) {
       return
     }
+
+    console.log("handleTouchMove")
+
+
     switch (nativeEvent.touches.length) {
       case 2:
-        if (this.currentGesture === GUESTURE_TYPE.PINCH) {
-          this.onPinchMove(syntheticEvent)
-        }
+        this.onPinchMove(syntheticEvent)
         break
       default:
         if (this.currentGesture === GUESTURE_TYPE.PAN) {
@@ -408,6 +463,12 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
       return
     }
     this.zoomArea.style.transitionDuration = '0.3s'
+
+    console.log("handleTouchEnd")
+
+    // this.onPinchEnd()
+    // this.onPanEnd()
+
     if (this.currentGesture === GUESTURE_TYPE.PINCH) {
       this.onPinchEnd()
     }
@@ -477,6 +538,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     const { onTransform, minZoomScale } = this.props
 
     if (!this.zoomAreaContainer || !this.zoomArea) {
+      console.log("setTransform - returning in 1st IF")
       return
     }
     const roundTransalteX = Math.round(translate.x * 1000) / 1000
@@ -484,6 +546,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
 
     // don't allow zoomFactor smaller then this.props.minZoomScale * 0.8
     if (zoomFactor < minZoomScale * 0.8) {
+      console.log("setTransform - returning in 2nd IF")
       return
     }
 
@@ -503,6 +566,9 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
         translate(${roundTransalteX}px, ${roundTransalteY}px)
         translateZ(${0})
       `
+
+      console.log("setTransform - END - roundTransalteY",roundTransalteY)
+
 
     this.zoomArea.style.transform = styleString
     this.zoomArea.style.webkitTransform = styleString

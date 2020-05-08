@@ -1,7 +1,7 @@
 {
-  "name": "react-pinch-and-zoom",
-  "version": "1.2.5",
-  "author": "Conrad Lo",
+  "name": "react-pinch-zoom-cust",
+  "version": "1.2.6",
+  "author": "Suresh S C",
   "description": "A react container component with pinch-to-zoom gesture interaction.",
   "keywords": [
     "react",
@@ -17,10 +17,10 @@
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/conradlo/react-pinch-and-zoom"
+    "url": "https://github.com/SureshSc/react-pinch-and-zoom"
   },
-  "homepage": "https://github.com/conradlo/react-pinch-and-zoom#readme",
-  "bugs": "https://github.com/conradlo/react-pinch-and-zoom/issues",
+  "homepage": "https://github.com/SureshSc/react-pinch-and-zoom#readme",
+  "bugs": "https://github.com/SureshSc/react-pinch-and-zoom/issues",
   "license": "MIT",
   "scripts": {
     "start": "node server.js",
