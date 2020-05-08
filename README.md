@@ -19,7 +19,7 @@ A react container component with pinch-to-zoom gesture interaction.
 
     ```shell
     # pwd: ~/project/dir
-    $ npm install react-pinch-and-zoom
+    $ npm install react-pinch-and-zoom-cust
     ```
 
 2. Import the component
@@ -59,7 +59,7 @@ A react container component with pinch-to-zoom gesture interaction.
 1. Pull this repository
     ```shell
     # pwd: ~/development/dir
-    $ git pull https://github.com/conradlo/react-pinch-and-zoom.git
+    $ git pull https://github.com/SureshSc/react-pinch-and-zoom.git
     ```
 1. Install dependency
     ```shell
