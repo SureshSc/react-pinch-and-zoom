@@ -107,7 +107,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
 
     // instance variable: transform data
     this.transform = {
-      zoomFactor: 1.0,
+      zoomFactor: this.props.startZoomFactor,
       translate: Point.newOriginPoint(),
     }
 
