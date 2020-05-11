@@ -1,6 +1,6 @@
 {
   "name": "react-pinch-zoom-cust",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "author": "Suresh S C <scs.6190@gmail.com>",
   "description": "A react container component with pinch-to-zoom gesture interaction.",
   "keywords": [
@@ -87,6 +87,7 @@
     "prop-types": "^15.6.2"
   },
   "dependencies": {},
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "jest": {
     "testEnvironment": "node",
     "roots": [
