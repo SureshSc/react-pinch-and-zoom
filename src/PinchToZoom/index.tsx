@@ -442,15 +442,15 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     if (!(nativeEvent instanceof TouchEvent)) {
       return
     }
-
-
     switch (nativeEvent.touches.length) {
       case 2:
         this.onPinchMove(syntheticEvent)
+        this.onPinchEnd()
         break
       default:
         if (this.currentGesture === GUESTURE_TYPE.PAN) {
           this.onPanMove(syntheticEvent)
+          this.onPanEnd()
         }
     }
   }
