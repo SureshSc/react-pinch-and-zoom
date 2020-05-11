@@ -87,7 +87,7 @@
     "prop-types": "^15.6.2"
   },
   "dependencies": {},
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
+  // "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "jest": {
     "testEnvironment": "node",
     "roots": [
