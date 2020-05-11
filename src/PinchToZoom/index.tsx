@@ -20,6 +20,7 @@ interface PinchToZoomProps {
   className: string
   minZoomScale: number
   maxZoomScale: number
+  startZoomFactor: number
   boundSize: Size.Size
   contentSize: Size.Size
   fillContainer?: boolean
@@ -604,6 +605,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
       transitionDuration: '0ms',
       perspective: 1000,
       width: '100%', // match `pinch-to-zoom-container` width
+      transform: `scale(${this.props.startZoomFactor})`
     }
 
     if (debug) {
@@ -641,6 +643,7 @@ PinchToZoom.defaultProps = {
   className: '',
   minZoomScale: 1.0,
   maxZoomScale: 4.0,
+  startZoomFactor: 1.0,
   boundSize: {
     width: 100,
     height: 100,
