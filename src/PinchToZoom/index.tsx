@@ -24,6 +24,7 @@ interface PinchToZoomProps {
   boundSize: Size.Size
   contentSize: Size.Size
   fillContainer?: boolean
+  supportPan: boolean
 
   /** Callback to run each time transform is updated */
   onTransform?: (
@@ -555,11 +556,16 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     }
 
     // update the transform style
-    const styleString = `
+    let styleString = `
+        scale(${zoomFactor}))
+      `
+    if (this.props.supportPan) {
+      styleString = `
         scale(${zoomFactor})
         translate(${roundTransalteX}px, ${roundTransalteY}px)
         translateZ(${0})
       `
+    }
 
     this.zoomArea.style.transform = styleString
     this.zoomArea.style.webkitTransform = styleString
@@ -599,7 +605,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     const zoomAreaInlineStyle = {
       display: 'inline-block',
       willChange: 'transform',
-      transformOrigin: '0px 0px 0px',
+      transformOrigin: 'top center',
       transition: 'transform 0ms ease',
       transitionTimingFunction: 'cubic-bezier(0.1, 0.57, 0.1, 1)',
       transitionDuration: '0ms',
@@ -644,6 +650,7 @@ PinchToZoom.defaultProps = {
   minZoomScale: 1.0,
   maxZoomScale: 4.0,
   startZoomFactor: 1.0,
+  supportPan: true,
   boundSize: {
     width: 100,
     height: 100,
