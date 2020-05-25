@@ -89,10 +89,6 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
 
   public currentGesture: GUESTURE_TYPE
 
-  public pinchPrevTouchPoints: {
-    point1: Point.Point,
-    point2: Point.Point,
-  }
   public pinchStartZoomFactor: number
   public pinchStartTouchMidpoint: Point.Point
   public pinchStartTranslate: Point.Point
@@ -117,10 +113,6 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     this.currentGesture = GUESTURE_TYPE.UNSET
 
     // instance variable: pinch
-    this.pinchPrevTouchPoints = {
-      point1: Point.newOriginPoint(),
-      point2: Point.newOriginPoint(),
-    }
     this.pinchStartZoomFactor = 1.0
     this.pinchStartTouchMidpoint = Point.newOriginPoint()
     this.pinchStartTranslate = Point.newOriginPoint()
@@ -171,7 +163,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     const [p1, p2] = PinchToZoom.getTouchesCoordinate(syntheticEvent)
 
     // on pinch start remember the mid point of 2 touch points
-    this.pinchStartTouchMidpoint = Point.midpoint(p1, p2) /* TODO(lpe): (delete) unused */
+    this.pinchStartTouchMidpoint = Point.midpoint(p1, p2)
 
     // on pinch start remember the distance of 2 touch points
     this.pinchStartTouchPointDist = Point.distance(p1, p2)
@@ -185,16 +177,13 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     this.pinchStartTranslate = currentTranslate
   }
 
-  /* BOOKMARK(lpe): () */
   public onPinchMove(syntheticEvent: React.SyntheticEvent) {
     // get lastest touch point coordinate
-    const currentTouchPointsArr = PinchToZoom.getTouchesCoordinate(syntheticEvent)
-    const currentTouchPoints = {
-      point1: currentTouchPointsArr[0],
-      point2: currentTouchPointsArr[1]
-    }
+    const [p1, p2] = PinchToZoom.getTouchesCoordinate(syntheticEvent)
 
-    const pinchCurrentTouchPointDist = Point.distance(currentTouchPoints.point1, currentTouchPoints.point2)
+    // const pinchCurrentTouchMidpoint = SeatingPlan.calculateMidpoint({ x1, y1 }, { x2, y2 });
+
+    const pinchCurrentTouchPointDist = Point.distance(p1, p2)
 
     // delta > 0: enlarge(zoon in), delta < 0: diminish(zoom out)
     const deltaTouchPointDist =
@@ -202,14 +191,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
 
     // update zoom factor
     const newZoomFactor = this.pinchStartZoomFactor + deltaTouchPointDist * 0.01
-
-    const currentMidpoint = Point.midpoint(currentTouchPoints.point1, currentTouchPoints.point2)
-    const prevMidpoint = Point.midpoint(this.pinchPrevTouchPoints.point1, this.pinchPrevTouchPoints.point2)
-    const offsetMoved = Point.offset(currentMidpoint, prevMidpoint);
-    const currentTranslate = Point.scale(offsetMoved, 1 / newZoomFactor);
-
-    this.zoomContentArea2(newZoomFactor, currentTranslate)
-    this.pinchPrevTouchPoints = currentTouchPoints;
+    this.zoomContentArea(newZoomFactor)
   }
 
   public onPinchEnd() {
@@ -328,7 +310,6 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     })
   }
 
-  /* BOOKMARK(lpe): () */
   /* perform zooming transfrom */
   public zoomContentArea(zoomFactor: number) {
     if (!this.zoomAreaContainer || !this.zoomArea) {
@@ -371,25 +352,6 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     this.setTransform({
       zoomFactor: truncRound(zoomFactor),
       translate: accumulateTranslate,
-    })
-  }
-
-  /* BOOKMARK(lpe): () */
-  /* perform zooming transfrom */
-  public zoomContentArea2(zoomFactor: number, translateDelta: Point.Point) {
-    if (!this.zoomAreaContainer || !this.zoomArea) {
-      return
-    }
-    const zoomFactorDelta = zoomFactor - this.transform.zoomFactor
-    const zoomOffsetPoint: Point.Point = {
-      x: zoomFactorDelta,
-      y: zoomFactorDelta,
-    }
-    const accumulatedTranslateDelta = Point.offset(translateDelta, zoomOffsetPoint)
-    const newTranslate = Point.sum(this.transform.translate, accumulatedTranslateDelta)
-    this.setTransform({
-      zoomFactor: truncRound(zoomFactor),
-      translate: newTranslate,
     })
   }
 
