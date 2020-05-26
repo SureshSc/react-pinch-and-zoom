@@ -8,9 +8,9 @@ import contentImage from 'demo/img/original.jpg'
 class App extends Component {
   render() {
     return (
-      <div>
+      <div style={{height:500}}>
           <h1>React Pinch and Zoom</h1>
-        <PinchToZoom className="w3-half">
+        <PinchToZoom >
           <img src={contentImage} />
         </PinchToZoom>
       </div>

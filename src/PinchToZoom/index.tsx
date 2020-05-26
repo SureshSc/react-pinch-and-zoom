@@ -99,6 +99,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
 
   public zoomAreaContainer?: HTMLDivElement
   public zoomArea?: HTMLDivElement
+  public spaceFiller?: HTMLDivElement
 
   constructor(props: PinchToZoomProps) {
     super(props)
@@ -153,6 +154,11 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
         this.zoomAreaContainer.dispatchEvent(endEvent)
       }
     }, 0)
+
+    const setT = this.setTransform.bind(this)
+    setTimeout(() => {
+        setT({zoomFactor:4, translate:{x: 50, y: 500}})
+    }, 2000)
   }
 
   /*
@@ -367,6 +373,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     if (!(nativeEvent instanceof TouchEvent)) {
       return
     }
+    this.leaveScrollMode()
     this.zoomArea.style.transitionDuration = '0.0s'
     // 2 touches == pinch, else all considered as pan
     switch (nativeEvent.touches.length) {
@@ -414,6 +421,8 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     if (this.currentGesture === GUESTURE_TYPE.PAN) {
       this.onPanEnd()
     }
+    // setTimeout(this.enterScrollMode.bind(this), 500)
+    this.enterScrollMode()
     this.currentGesture = GUESTURE_TYPE.UNSET
   }
 
@@ -476,7 +485,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
   } = {}) {
     const { onTransform, minZoomScale } = this.props
 
-    if (!this.zoomAreaContainer || !this.zoomArea) {
+    if (!this.zoomAreaContainer || !this.zoomArea || !this.spaceFiller) {
       return
     }
     const roundTransalteX = Math.round(translate.x * 1000) / 1000
@@ -508,6 +517,49 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
     this.zoomArea.style.webkitTransform = styleString
   }
 
+  public leaveScrollMode() {
+    if (this.currentGesture !== GUESTURE_TYPE.UNSET || !this.zoomAreaContainer || !this.zoomArea || !this.spaceFiller) {
+      return
+    }
+    const zoomFactor = this.transform.zoomFactor
+    this.transform.translate.x = - this.zoomAreaContainer.scrollLeft / zoomFactor
+    this.transform.translate.y = - this.zoomAreaContainer.scrollTop / zoomFactor
+
+    this.zoomAreaContainer.scrollTo(0,0)
+    this.zoomAreaContainer.style.overflow = "hidden"
+    window.document.title = this.zoomAreaContainer.scrollWidth + " translate"
+
+    this.spaceFiller.style.width = "0px"
+    this.spaceFiller.style.height = "0px"
+
+    this.setTransform();
+  }
+
+  public enterScrollMode() {
+    if (!this.zoomAreaContainer || !this.zoomArea || !this.spaceFiller) {
+      return
+    }
+    const zoomFactor = this.transform.zoomFactor
+
+    // update the transform style
+    const styleString = `
+        scale(${zoomFactor})
+        translate(${0}px, ${0}px)
+        translateZ(${0})
+      `
+    this.zoomArea.style.transitionDuration = "0s";
+    this.zoomArea.style.transform = styleString
+    this.zoomArea.style.webkitTransform = styleString
+
+    this.spaceFiller.style.width = this.zoomArea.clientWidth * zoomFactor + "px"
+    this.spaceFiller.style.height = this.zoomArea.clientHeight * zoomFactor - this.zoomArea.clientHeight + "px"
+      
+    window.document.title = this.zoomAreaContainer.scrollWidth + " scroll"
+
+    this.zoomAreaContainer.style.overflow = "scroll"
+    this.zoomAreaContainer.scrollTo(- this.transform.translate.x * zoomFactor, - this.transform.translate.y * zoomFactor)
+  }
+
   /*
     get a *copy* of current zoom area transformation value
   */
@@ -533,7 +585,7 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
 
     const containerInlineStyle = {
       display: 'inline-block',
-      overflow: 'hidden',
+      overflow: 'scroll',
       backgroundColor: 'inherit',
       width: fillContainer ? '100%' : undefined,
       height: fillContainer ? '100%' : undefined,
@@ -548,6 +600,10 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
       transitionDuration: '0ms',
       perspective: 1000,
       width: '100%', // match `pinch-to-zoom-container` width
+    }
+    const spaceFillerInlineStyle = {
+      width: 0,
+      height: 0,
     }
 
     if (debug) {
@@ -575,6 +631,12 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
         >
           {children}
         </div>
+        <div 
+          style={spaceFillerInlineStyle}
+          ref={c => {
+            this.spaceFiller = c || undefined
+          }}
+        />
       </div>
     )
   }
@@ -593,7 +655,7 @@ PinchToZoom.defaultProps = {
     width: 100,
     height: 100,
   },
-  fillContainer: false,
+  fillContainer: true,
 }
 
 PinchToZoom.propTypes = {
