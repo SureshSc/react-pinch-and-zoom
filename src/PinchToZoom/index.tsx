@@ -191,21 +191,21 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
 
     const delta= parseFloat( this.previousTouchDist.toFixed(3)) - parseFloat(pinchCurrentTouchPointDist.toFixed(3)) ;// Math.floor(this.previousTouchDist) - Math.floor( pinchCurrentTouchPointDist)
     
-    if (delta > -3 && delta < 3) {
-      if (this.currentGesture === GUESTURE_TYPE.PINCH) {
-        this.handleTouchStartForPanFromPinch(syntheticEvent)
-        this.onPinchEnd()
-      }
-      this.currentGesture =  GUESTURE_TYPE.PAN
-      this.previousTouchDist = pinchCurrentTouchPointDist
-      this.onPanMove(syntheticEvent)
-      return
-    }
+    // if (delta > -3 && delta < 3) {
+    //   if (this.currentGesture === GUESTURE_TYPE.PINCH) {
+    //     this.handleTouchStartForPanFromPinch(syntheticEvent)
+    //     this.onPinchEnd()
+    //   }
+    //   this.currentGesture =  GUESTURE_TYPE.PAN
+    //   this.previousTouchDist = pinchCurrentTouchPointDist
+    //   this.onPanMove(syntheticEvent)
+    //   return
+    // }
 
-    if (this.currentGesture === GUESTURE_TYPE.PAN) {
-      this.onPinchStart(syntheticEvent)
-      this.onPanEnd()
-    }
+    // if (this.currentGesture === GUESTURE_TYPE.PAN) {
+    //   this.onPinchStart(syntheticEvent)
+    //   this.onPanEnd()
+    // }
     this.currentGesture =  GUESTURE_TYPE.PINCH
 
     this.previousTouchDist = pinchCurrentTouchPointDist
@@ -430,10 +430,10 @@ class PinchToZoom extends React.Component<PinchToZoomProps, PinchToZoomState> {
         break
       default: {
         /* don't allow pan if zoom factor === minZoomScale */
-        const [p1] = PinchToZoom.getTouchesCoordinate(syntheticEvent)
-        this.setState({ lastSingleTouchPoint: p1 })
-        this.currentGesture = GUESTURE_TYPE.PAN
-        this.onPanStart(syntheticEvent)
+        // const [p1] = PinchToZoom.getTouchesCoordinate(syntheticEvent)
+        // this.setState({ lastSingleTouchPoint: p1 })
+        // this.currentGesture = GUESTURE_TYPE.PAN
+        // this.onPanStart(syntheticEvent)
       }
     }
   }
