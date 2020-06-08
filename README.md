@@ -25,7 +25,7 @@ A react container component with pinch-to-zoom gesture interaction.
 2. Import the component
 
     ```jsx
-    import PinchToZoom from 'react-pinch-and-zoom-cust';
+    import PinchToZoom from 'react-pinch-zoom-cust';
     ```
 3. Wrap the pinch-able component inside `PinchToZoom` component
 
